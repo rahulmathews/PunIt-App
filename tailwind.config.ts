@@ -1,21 +1,12 @@
-import type { Config } from "tailwindcss";
-
-const config: Config = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx,html}",
-  ],
+module.exports = {
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  important: "#root",
   theme: {
-    extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
-    },
+    extend: {},
   },
-  corePlugins: { preflight: false },
+  corePlugins: {
+    // Remove the Tailwind CSS preflight styles so it can use Material UI's preflight instead (CssBaseline).
+    preflight: false,
+  },
   plugins: [],
 };
-export default config;

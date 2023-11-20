@@ -39,7 +39,7 @@ const AuthLogin = () => {
     <>
       <Formik
         initialValues={{
-          email: "info@codedthemes.com",
+          email: "robo@punit.com",
           password: "123456",
           submit: null,
         }}
@@ -74,7 +74,7 @@ const AuthLogin = () => {
           values,
         }) => (
           <form noValidate onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Stack spacing={1}>
                   <InputLabel htmlFor="email-login">Email Address</InputLabel>
@@ -141,7 +141,7 @@ const AuthLogin = () => {
                 </Stack>
               </Grid>
 
-              <Grid item xs={12} sx={{ mt: -1 }}>
+              <Grid item xs={12}>
                 <Stack
                   direction="row"
                   justifyContent="space-between"
@@ -171,14 +171,6 @@ const AuthLogin = () => {
                   Login
                 </Button>
               </Grid>
-              {/* <Grid item xs={12}>
-                <Divider>
-                  <Typography variant="caption"> Login with</Typography>
-                </Divider>
-              </Grid>
-              <Grid item xs={12}>
-                <FirebaseSocial />
-              </Grid> */}
             </Grid>
           </form>
         )}

@@ -10,7 +10,6 @@ const LogoSection = ({}) => {
       // component={Link}
       // onClick={() => dispatch(activeItem({ openItem: [defaultId] }))}
       // to={!to ? config.defaultPath : to}
-      sx={{ margin: "0px" }}
     >
       <Logo />
     </ButtonBase>

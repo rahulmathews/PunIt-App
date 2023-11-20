@@ -24,7 +24,7 @@ const AuthWrapper = ({ children }: any) => (
         minHeight: "100vh",
       }}
     >
-      <Grid item xs={12} sx={{ ml: 3, mt: 3 }}>
+      <Grid item xs={12}>
         <Logo />
       </Grid>
 
@@ -44,7 +44,7 @@ const AuthWrapper = ({ children }: any) => (
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs={12} sx={{ m: 3, mt: 1 }}>
+      <Grid item xs={12} sx={{ m: 2 }}>
         <AuthFooter />
       </Grid>
     </Grid>

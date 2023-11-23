@@ -19,11 +19,7 @@
       }
     ],
     "paths": {
-      "@punit-app/components/*": ["./src/components/*"],
-      "@punit-app/hooks/*": ["./src/hooks/*"],
-      "@punit-app/pages/*": ["./src/pages/*"],
-      "@punit-app/utils/*": ["./src/utils/*"],
-      "@punit-app/styles/*": ["./src/styles/*"]
+      "@punit-app/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

@@ -23,7 +23,10 @@ const AuthFooter = () => {
             target="_blank"
             underline="hover"
           >
-            Anonymous
+            Anonymous&#8482;&nbsp;
+            <Typography variant="subtitle2" color="secondary" component="span">
+              team
+            </Typography>
           </Typography>
         </Typography>
 

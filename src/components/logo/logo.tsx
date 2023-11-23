@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-const Logo = () => {
+const Logo = ({ className, props }: any) => {
   return (
     <>
       <Image
@@ -8,6 +8,8 @@ const Logo = () => {
         alt={"Logo-tv"}
         height={60}
         width={100}
+        className={className}
+        {...props}
       />
     </>
   );

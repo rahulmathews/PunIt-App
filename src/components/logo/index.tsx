@@ -1,24 +1,15 @@
 import PropTypes from "prop-types";
 
-import { ButtonBase } from "@mui/material";
 import Logo from "./logo";
+import React from "react";
 
-const LogoSection = ({}) => {
-  return (
-    <ButtonBase
-      disableRipple
-      // component={Link}
-      // onClick={() => dispatch(activeItem({ openItem: [defaultId] }))}
-      // to={!to ? config.defaultPath : to}
-    >
-      <Logo />
-    </ButtonBase>
-  );
+const LogoSection = ({ className, props }: any) => {
+  return <Logo className={className} {...props} />;
 };
 
-LogoSection.propTypes = {
-  sx: PropTypes.object,
-  to: PropTypes.string,
-};
+// LogoSection.propTypes = {
+//   sx: PropTypes.object,
+//   to: PropTypes.string,
+// };
 
 export default LogoSection;

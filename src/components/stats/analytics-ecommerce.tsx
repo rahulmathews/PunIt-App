@@ -59,7 +59,7 @@ const AnalyticEcommerce = ({
     </Stack>
     <Box sx={{ pt: 2.25 }}>
       <Typography variant="caption" color="textSecondary">
-        You made an extra{" "}
+        Total count up by{" "}
         <Typography
           component="span"
           variant="caption"

@@ -102,6 +102,7 @@ const MonthlyBarChart = () => {
         series={series}
         type="bar"
         height={365}
+        name={true}
       />
     </div>
   );

@@ -92,41 +92,41 @@ function stableSort(
 
 interface IHeadCell {
   id: string;
-  align: "left" | "right";
+  align: "left" | "right" | "center";
   disablePadding: boolean;
   label: string;
 }
 const headCells: IHeadCell[] = [
   {
     id: "trackingNo",
-    align: "left",
+    align: "center",
     disablePadding: false,
     label: "Tracking No.",
   },
   {
     id: "name",
-    align: "left",
+    align: "center",
     disablePadding: true,
-    label: "Product Name",
+    label: "Reported By",
   },
   {
     id: "fat",
-    align: "right",
+    align: "center",
     disablePadding: false,
-    label: "Total Order",
+    label: "Post",
   },
   {
     id: "carbs",
-    align: "left",
+    align: "center",
     disablePadding: false,
 
     label: "Status",
   },
   {
     id: "protein",
-    align: "right",
+    align: "center",
     disablePadding: false,
-    label: "Total Amount",
+    label: "Total Reports",
   },
 ];
 
@@ -230,6 +230,11 @@ export default function OrderTable() {
             "& .MuiTableCell-root:last-of-type": {
               pr: 3,
             },
+
+            "td, th": {
+              border: "2px solid skyblue",
+              borderCollapse: "collapse",
+            },
           }}
         >
           <OrderTableHead order={order} orderBy={orderBy} />
@@ -270,7 +275,6 @@ export default function OrderTable() {
                   <TableRow
                     hover
                     role="checkbox"
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     aria-checked={isItemSelected}
                     tabIndex={-1}
                     key={row.trackingNo}
@@ -280,23 +284,23 @@ export default function OrderTable() {
                       component="th"
                       id={labelId}
                       scope="row"
-                      align="left"
+                      align="center"
                     >
                       <Link color="secondary" href="">
                         {row.trackingNo as string}
                       </Link>
                     </TableCell>
-                    <TableCell align="left">{row.name}</TableCell>
-                    <TableCell align="right">{row.fat}</TableCell>
-                    <TableCell align="left">
+                    <TableCell align="center">{row.name}</TableCell>
+                    <TableCell align="center">{row.fat}</TableCell>
+                    <TableCell align="center">
                       <OrderStatus status={row.carbs} />
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell align="center">
                       <NumericFormat
                         value={row.protein}
                         displayType="text"
                         thousandSeparator
-                        prefix="$"
+                        // prefix="$"
                       />
                     </TableCell>
                   </TableRow>

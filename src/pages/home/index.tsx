@@ -111,7 +111,7 @@ const DashboardDefault = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={3}>
           <AnalyticEcommerce
-            title="Total Order"
+            title="Total Posts"
             count="18,800"
             percentage={27.4}
             isLoss
@@ -121,12 +121,12 @@ const DashboardDefault = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={3}>
           <AnalyticEcommerce
-            title="Total Sales"
-            count="$35,078"
+            title="Total Reports"
+            count="35,078"
             percentage={27.4}
             isLoss
             color="warning"
-            extra="$20,395"
+            extra="20,395"
           />
         </Grid>
 
@@ -172,7 +172,7 @@ const DashboardDefault = () => {
         <Grid item xs={12} md={5} lg={4}>
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
-              <Typography variant="h5">Income Overview</Typography>
+              <Typography variant="h5">Reports Overview</Typography>
             </Grid>
             <Grid item />
           </Grid>
@@ -182,7 +182,7 @@ const DashboardDefault = () => {
                 <Typography variant="h6" color="textSecondary">
                   This Week Statistics
                 </Typography>
-                <Typography variant="h3">$7,650</Typography>
+                <Typography variant="h3">7,650</Typography>
               </Stack>
             </Box>
             <MonthlyBarChart />
@@ -190,10 +190,10 @@ const DashboardDefault = () => {
         </Grid>
 
         {/* row 3 */}
-        <Grid item xs={12} md={7} lg={8}>
+        <Grid item xs={12} md={7} lg={12}>
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
-              <Typography variant="h5">Recent Orders</Typography>
+              <Typography variant="h5">Recent Reports</Typography>
             </Grid>
             <Grid item />
           </Grid>
@@ -201,7 +201,8 @@ const DashboardDefault = () => {
             <OrdersTable />
           </MainCard>
         </Grid>
-        <Grid item xs={12} md={5} lg={4}>
+
+        {/* <Grid item xs={12} md={5} lg={4}>
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
               <Typography variant="h5">Analytics Report</Typography>
@@ -225,10 +226,10 @@ const DashboardDefault = () => {
             </List>
             <ReportAreaChart />
           </MainCard>
-        </Grid>
+        </Grid> */}
 
         {/* row 4 */}
-        <Grid item xs={12} md={7} lg={8}>
+        {/* <Grid item xs={12} md={7} lg={8}>
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
               <Typography variant="h5">Sales Report</Typography>
@@ -408,7 +409,7 @@ const DashboardDefault = () => {
               </Button>
             </Stack>
           </MainCard>
-        </Grid>
+        </Grid> */}
       </Grid>
     </>
   );

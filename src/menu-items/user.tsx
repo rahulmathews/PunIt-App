@@ -12,9 +12,9 @@ const icons = {
   HomeOutlined,
 };
 
-// ==============================|| MENU ITEMS - EXTRA PAGES ||============================== //
+// ==============================|| MENU ITEMS - User ||============================== //
 
-const pages = {
+const user = {
   id: "non-admin",
   title: "Users",
   type: "group",
@@ -23,11 +23,11 @@ const pages = {
       id: "home",
       title: "Home",
       type: "item",
-      url: "/login",
+      url: "/home",
       icon: icons.HomeOutlined,
-      target: true,
+      breadcrumbs: true,
     },
   ],
 };
 
-export default pages;
+export default user;

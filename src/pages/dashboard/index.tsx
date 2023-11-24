@@ -72,7 +72,7 @@ const status = [
 
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
-const Home = () => {
+const Dashboard = () => {
   const [value, setValue] = useState("today");
   const [slot, setSlot] = useState("week");
 
@@ -415,4 +415,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Dashboard;

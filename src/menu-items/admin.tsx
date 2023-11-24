@@ -16,9 +16,9 @@ const icons = {
   ExclamationCircleOutlined,
 };
 
-// ==============================|| MENU ITEMS - DASHBOARD ||============================== //
+// ==============================|| MENU ITEMS - ADMIN ||============================== //
 
-const dashboard = {
+const admin = {
   id: "group-dashboard",
   title: "Admin",
   type: "group",
@@ -27,7 +27,7 @@ const dashboard = {
       id: "dashboard",
       title: "Dashboard",
       type: "item",
-      url: "/dashboard/default",
+      url: "/dashboard",
       icon: icons.BarChartOutlined,
       breadcrumbs: true,
     },
@@ -35,7 +35,7 @@ const dashboard = {
       id: "users",
       title: "Users",
       type: "item",
-      url: "/dashboard/default",
+      url: "/users",
       icon: icons.UserOutlined,
       breadcrumbs: true,
     },
@@ -43,7 +43,7 @@ const dashboard = {
       id: "posts",
       title: "Posts",
       type: "item",
-      url: "/dashboard/default",
+      url: "/posts",
       icon: icons.CommentOutlined,
       breadcrumbs: true,
     },
@@ -51,11 +51,11 @@ const dashboard = {
       id: "reports",
       title: "Reports",
       type: "item",
-      url: "/dashboard/default",
+      url: "/reports",
       icon: icons.ExclamationCircleOutlined,
       breadcrumbs: true,
     },
   ],
 };
 
-export default dashboard;
+export default admin;

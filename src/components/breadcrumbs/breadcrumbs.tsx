@@ -83,7 +83,8 @@ const Breadcrumbs = ({ navigation, title, ...others }: any) => {
       breadcrumbContent = (
         <MainCard
           border={false}
-          sx={{ mb: 3, bgcolor: "transparent" }}
+          boxShadow={false}
+          sx={{ backgroundColor: "unset" }}
           {...others}
           content={false}
         >
@@ -109,11 +110,11 @@ const Breadcrumbs = ({ navigation, title, ...others }: any) => {
                 {itemContent}
               </MuiBreadcrumbs>
             </Grid>
-            {title && (
+            {/* {title && (
               <Grid item sx={{ mt: 2 }}>
                 <Typography variant="h5">{(item as any).title}</Typography>
               </Grid>
-            )}
+            )} */}
           </Grid>
         </MainCard>
       );

@@ -15,7 +15,7 @@ const MainCard = forwardRef<typeof Card, IMainCard>(
   (
     {
       border = true,
-      boxShadow,
+      boxShadow = true,
       children,
       content = true,
       contentSX = {},
@@ -31,7 +31,6 @@ const MainCard = forwardRef<typeof Card, IMainCard>(
     ref
   ) => {
     const theme = useTheme();
-    boxShadow = theme.palette.mode === "dark" ? boxShadow || true : boxShadow;
 
     return (
       <Card
@@ -42,9 +41,13 @@ const MainCard = forwardRef<typeof Card, IMainCard>(
           border: border ? "1px solid" : "none",
           borderRadius: 2,
           borderColor: theme.palette.grey.A700,
-          boxShadow: `0px 4px 8px ${alpha(theme.palette.grey[900], 0.15)}`,
+          boxShadow: boxShadow
+            ? `0px 4px 8px ${alpha(theme.palette.grey[900], 0.15)}`
+            : "none",
           ":hover": {
-            boxShadow: "0px 6px 12px 4px rgb(33 33 33 / 38%)",
+            ...(boxShadow
+              ? { boxShadow: "0px 6px 12px 4px rgb(33 33 33 / 38%)" }
+              : {}),
           },
           "& pre": {
             m: 0,

@@ -1,13 +1,13 @@
 // project import
-import pages from "./pages";
-import dashboard from "./dashboard";
+import user from "./user";
+import admin from "./admin";
 import utilities from "./utilities";
 import support from "./support";
 
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems = {
-  items: [pages, dashboard],
+  items: [user, admin],
 };
 
 export default menuItems;

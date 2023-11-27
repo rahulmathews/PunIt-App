@@ -63,7 +63,7 @@ const AuthRegister = () => {
     event.preventDefault();
   };
 
-  const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/users/register`;
+  const queryUrl = `http://punit-load-balancer-933553765.us-east-1.elb.amazonaws.com/api/users/register`;
 
   const refetch = async (values: any) => {
     const data = await fetch(queryUrl, {

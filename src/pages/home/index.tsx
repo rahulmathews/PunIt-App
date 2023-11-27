@@ -16,8 +16,8 @@ import NewsFeed from "@punit-app/components/news-feed/news-feed";
 import MainLayout from "@punit-app/layout/main-layout";
 import { useSelector } from "react-redux";
 
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+// import ReactQuill from "react-quill";
+// import "react-quill/dist/quill.snow.css";
 
 // import { Spin } from 'antd';
 import dynamic from "next/dynamic";
@@ -203,7 +203,7 @@ const Home = () => {
 
   const [value, setValue] = useState("");
 
-  const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/jokes`;
+  const queryUrl = `http://punit-load-balancer-933553765.us-east-1.elb.amazonaws.com/api/jokes`;
 
   const handleSubmit = async () => {
     const reqBody = {};

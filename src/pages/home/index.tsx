@@ -23,10 +23,10 @@ import { useSelector } from "react-redux";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
-const QuillNoSSRWrapper = dynamic(import("react-quill"), {
-  ssr: false,
-  loading: () => null,
-});
+// const QuillNoSSRWrapper = dynamic(import("react-quill"), {
+//   ssr: false,
+//   loading: () => null,
+// });
 
 // avatar style
 const avatarSX = {
@@ -260,13 +260,13 @@ const Home = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <QuillNoSSRWrapper
+          {/* <QuillNoSSRWrapper
             theme="snow"
             value={value}
             onChange={setValue}
             modules={modules}
             formats={formats}
-          />
+          /> */}
 
           <Button
             disableElevation

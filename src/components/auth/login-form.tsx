@@ -2,6 +2,7 @@ import React from "react";
 
 // material-ui
 import {
+  Alert,
   Button,
   FormHelperText,
   Grid,
@@ -9,6 +10,7 @@ import {
   InputAdornment,
   InputLabel,
   OutlinedInput,
+  Snackbar,
   Stack,
 } from "@mui/material";
 
@@ -18,6 +20,8 @@ import Link from "next/link";
 import * as Yup from "yup";
 import { Formik } from "formik";
 
+import { useRouter } from "next/navigation";
+
 // assets
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 
@@ -25,6 +29,22 @@ import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 
 const AuthLogin = () => {
   const [checked, setChecked] = React.useState(false);
+
+  const [success, setSuccess] = React.useState(false);
+  const [error, setError] = React.useState(false);
+
+  const handleClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "success") {
+      setSuccess(false);
+    } else {
+      setError(false);
+    }
+  };
+
+  const router = useRouter();
 
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
@@ -35,8 +55,57 @@ const AuthLogin = () => {
     event.preventDefault();
   };
 
+  const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/users/login`;
+
+  const refetch = async (values: any) => {
+    const reqBody = {};
+    const data: any = await fetch(queryUrl, {
+      method: "POST",
+      body: JSON.stringify({
+        email: values.email,
+        password: values.password,
+      }),
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .catch((err) => setError(true));
+
+    if (data && data.accessToken) {
+      localStorage.setItem("access_token", data.accessToken);
+      router.push("/home");
+      setSuccess(true);
+    }
+  };
+
   return (
     <>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={success}
+        autoHideDuration={8000}
+        onClose={(e) => handleClose(e, "success")}
+      >
+        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+          Successfully Logged In
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={error}
+        autoHideDuration={8000}
+        onClose={(e) => handleClose(e, "error")}
+      >
+        <Alert
+          onClose={(e) => handleClose(e, "error")}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Internal Server Error
+        </Alert>
+      </Snackbar>
       <Formik
         initialValues={{
           email: "robo@punit.com",
@@ -57,6 +126,7 @@ const AuthLogin = () => {
           try {
             setStatus({ success: false });
             setSubmitting(false);
+            await refetch(values);
           } catch (err: any) {
             setStatus({ success: false });
             setErrors({ submit: err.message });
@@ -141,18 +211,6 @@ const AuthLogin = () => {
                 </Stack>
               </Grid>
 
-              <Grid item xs={12}>
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  spacing={2}
-                >
-                  <Link href="/" color="text.primary">
-                    Forgot Password?
-                  </Link>
-                </Stack>
-              </Grid>
               {errors.submit && (
                 <Grid item xs={12}>
                   <FormHelperText error>{errors.submit}</FormHelperText>

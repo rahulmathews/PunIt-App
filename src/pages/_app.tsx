@@ -6,12 +6,15 @@ import { AppProps } from "next/app";
 
 import Head from "next/head";
 import { Provider } from "react-redux";
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import ThemeCustomization from "@punit-app/themes";
 
 export const metadata: Metadata = {
   title: "PunIt App",
   description: "Coded by Anonumous team",
 };
+
+const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -25,8 +28,10 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel="shortcut icon" href="/favicon.svg" />
       </Head>
       <ThemeCustomization>
-        {/* <BrowserRouter> */}
-        <Component {...pageProps} />
+        <QueryClientProvider client={queryClient}>
+          {/* <BrowserRouter> */}
+          <Component {...pageProps} />
+        </QueryClientProvider>
         {/* </BrowserRouter> */}
       </ThemeCustomization>
     </Provider>

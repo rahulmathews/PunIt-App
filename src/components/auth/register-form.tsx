@@ -3,6 +3,7 @@ import Link from "next/link";
 
 // material-ui
 import {
+  Alert,
   Box,
   Button,
   FormControl,
@@ -12,6 +13,7 @@ import {
   InputAdornment,
   InputLabel,
   OutlinedInput,
+  Snackbar,
   Stack,
   Typography,
 } from "@mui/material";
@@ -19,6 +21,7 @@ import {
 // third party
 import * as Yup from "yup";
 import { Formik } from "formik";
+import { useField } from "formik";
 
 // project import
 // import FirebaseSocial from './FirebaseSocial';
@@ -27,11 +30,30 @@ import { Formik } from "formik";
 
 // assets
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
+import React from "react";
 
 // ============================|| FIREBASE - REGISTER ||============================ //
 
 const AuthRegister = () => {
   const [level, setLevel] = useState();
+  const [success, setSuccess] = React.useState(false);
+  const [error, setError] = React.useState(false);
+
+  const handleClick = () => {
+    setSuccess(true);
+  };
+
+  const handleClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "success") {
+      setSuccess(false);
+    } else {
+      setError(false);
+    }
+  };
+
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -41,8 +63,60 @@ const AuthRegister = () => {
     event.preventDefault();
   };
 
+  const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/users/register`;
+
+  const refetch = async (values: any) => {
+    const data = await fetch(queryUrl, {
+      method: "POST",
+      body: JSON.stringify({
+        email: values.email,
+        password: values.password,
+        firstName: values.firstname,
+        lastName: values.lastname,
+      }),
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .catch((err) => setError(true));
+
+    if (data) {
+      setSuccess(true);
+    }
+  };
+
   return (
     <>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={success}
+        autoHideDuration={8000}
+        onClose={(e) => handleClose(e, "success")}
+      >
+        <Alert
+          onClose={(e) => handleClose(e, "success")}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Successfully Registered
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={error}
+        autoHideDuration={8000}
+        onClose={(e) => handleClose(e, "error")}
+      >
+        <Alert
+          onClose={(e) => handleClose(e, "error")}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Internal Server Error
+        </Alert>
+      </Snackbar>
       <Formik
         initialValues={{
           firstname: "",
@@ -65,6 +139,7 @@ const AuthRegister = () => {
           try {
             setStatus({ success: false });
             setSubmitting(false);
+            await refetch(values as any);
           } catch (err: any) {
             console.error(err);
             setStatus({ success: false });

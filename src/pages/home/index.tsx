@@ -1,43 +1,32 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 // material-ui
 import {
-  Avatar,
-  AvatarGroup,
+  Alert,
   Box,
   Button,
   Grid,
-  List,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemSecondaryAction,
-  ListItemText,
-  MenuItem,
-  Stack,
-  TextField,
+  Modal,
+  Snackbar,
   Typography,
 } from "@mui/material";
-
-// project import
-import OrdersTable from "@punit-app/components/tables/orders-table";
-import IncomeAreaChart from "@punit-app/components/charts/income-area-chart";
-import MonthlyBarChart from "@punit-app/components/charts/monthly-bar-chart";
-import ReportAreaChart from "@punit-app/components/charts/report-area-chart";
-import SalesColumnChart from "@punit-app/components/charts/sales-column-chart";
-import MainCard from "@punit-app/components/cards/main-card";
-import AnalyticEcommerce from "@punit-app/components/stats/analytics-ecommerce";
-
-// assets
-import {
-  GiftOutlined,
-  MessageOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
 
 import NewsFeed from "@punit-app/components/news-feed/news-feed";
 
 import MainLayout from "@punit-app/layout/main-layout";
 import { useSelector } from "react-redux";
+
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
+// import { Spin } from 'antd';
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+
+const QuillNoSSRWrapper = dynamic(import("react-quill"), {
+  ssr: false,
+  loading: () => null,
+});
 
 // avatar style
 const avatarSX = {
@@ -55,6 +44,35 @@ const actionSX = {
   alignSelf: "flex-start",
   transform: "none",
 };
+
+const modules = {
+  toolbar: [
+    [{ header: [1, 2, false] }],
+    ["bold", "italic", "underline", "strike", "blockquote"],
+    [
+      { list: "ordered" },
+      { list: "bullet" },
+      { indent: "-1" },
+      { indent: "+1" },
+    ],
+    ["link", "image"],
+    ["clean"],
+  ],
+};
+
+const formats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "blockquote",
+  "list",
+  "bullet",
+  "indent",
+  "link",
+  "image",
+];
 
 // sales report status
 const status = [
@@ -147,16 +165,121 @@ const jokes = [
   },
 ];
 
+const style = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 600,
+  height: 550,
+  overflowY: "scroll",
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 const Home = () => {
-  const [value, setValue] = useState("today");
-  const [slot, setSlot] = useState("week");
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "success") {
+      setSuccess(false);
+    } else {
+      setError(false);
+    }
+  };
+  const [success, setSuccess] = React.useState(false);
+  const [error, setError] = React.useState(false);
+
+  const router = useRouter();
 
   const { drawerOpen } = useSelector((state: any) => state.menu);
 
+  const [value, setValue] = useState("");
+
+  const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/jokes`;
+
+  const handleSubmit = async () => {
+    const reqBody = {};
+    const data: any = await fetch(queryUrl, {
+      method: "POST",
+      body: JSON.stringify({
+        content: value,
+      }),
+      headers: {
+        "content-type": "application/json",
+        authorization: localStorage.getItem("access_token") as any,
+      },
+    })
+      .then((response) => response.json())
+      .catch((err) => setError(true));
+
+    if (data) {
+      router.push("/home");
+      setSuccess(true);
+    }
+  };
+
   return (
     <>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={success}
+        autoHideDuration={8000}
+        onClose={(e) => handleClose(e, "success")}
+      >
+        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+          Successfully Submitted the joke
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={error}
+        autoHideDuration={8000}
+        onClose={(e) => handleClose(e, "error")}
+      >
+        <Alert
+          onClose={(e) => handleClose(e, "error")}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Internal Server Error
+        </Alert>
+      </Snackbar>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <QuillNoSSRWrapper
+            theme="snow"
+            value={value}
+            onChange={setValue}
+            modules={modules}
+            formats={formats}
+          />
+
+          <Button
+            disableElevation
+            sx={{ mt: 3 }}
+            size="small"
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+          >
+            Submit
+          </Button>
+        </Box>
+      </Modal>
       <MainLayout />
       <Grid
         container
@@ -169,6 +292,16 @@ const Home = () => {
         {/* row 1 */}
         <Grid item xs={12} sx={{ mb: -2.25 }}>
           <Typography variant="h5">Home</Typography>
+          <Button
+            disableElevation
+            size="small"
+            variant="contained"
+            color="primary"
+            onClick={handleOpen}
+            sx={{ float: "right" }}
+          >
+            Add new Joke
+          </Button>
         </Grid>
         <Grid xs={12} sx={{ mb: -2.25 }}>
           <NewsFeed content={"Haha nice joke"} />

@@ -55,7 +55,7 @@ const AuthLogin = () => {
     event.preventDefault();
   };
 
-  const queryUrl = `http://3.81.202.130:3002/api/users/login`;
+  const queryUrl = `https://e82p72f2bh.execute-api.us-east-1.amazonaws.com/Dev/api/users/login`;
 
   const refetch = async (values: any) => {
     const reqBody = {};

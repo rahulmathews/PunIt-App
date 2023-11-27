@@ -63,7 +63,7 @@ const AuthRegister = () => {
     event.preventDefault();
   };
 
-  const queryUrl = `http://3.81.202.130:3002/api/users/register`;
+  const queryUrl = `https://e82p72f2bh.execute-api.us-east-1.amazonaws.com/Dev/api/users/register`;
 
   const refetch = async (values: any) => {
     const data = await fetch(queryUrl, {

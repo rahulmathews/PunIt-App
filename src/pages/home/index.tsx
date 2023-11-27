@@ -203,7 +203,7 @@ const Home = () => {
 
   const [value, setValue] = useState("");
 
-  const queryUrl = `http://punit-load-balancer-933553765.us-east-1.elb.amazonaws.com/api/jokes`;
+  const queryUrl = `http://3.81.202.130:3002/api/jokes`;
 
   const handleSubmit = async () => {
     const reqBody = {};

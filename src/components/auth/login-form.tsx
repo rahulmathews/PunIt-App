@@ -67,6 +67,7 @@ const AuthLogin = () => {
       }),
       headers: {
         "content-type": "application/json",
+        "access-control-allow-origin": "*",
       },
     })
       .then((response) => response.json())

@@ -214,6 +214,7 @@ const Home = () => {
       }),
       headers: {
         "content-type": "application/json",
+        "access-control-allow-origin": "*",
         authorization: localStorage.getItem("access_token") as any,
       },
     })

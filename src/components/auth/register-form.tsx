@@ -76,7 +76,8 @@ const AuthRegister = () => {
       }),
       headers: {
         "content-type": "application/json",
-        "access-control-allow-origin": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
       },
     })
       .then((response) => response.json())

@@ -55,7 +55,7 @@ const AuthLogin = () => {
     event.preventDefault();
   };
 
-  const queryUrl = `https://e82p72f2bh.execute-api.us-east-1.amazonaws.com/Dev/api/users/login`;
+  const queryUrl = `https://d7b66a4ksmyox6ckdgqw4iibmq0lwnxd.lambda-url.us-east-1.on.aws/api/users/login`;
 
   const refetch = async (values: any) => {
     const reqBody = {};

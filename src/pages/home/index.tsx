@@ -203,7 +203,7 @@ const Home = () => {
 
   const [value, setValue] = useState("");
 
-  const queryUrl = `https://e82p72f2bh.execute-api.us-east-1.amazonaws.com/Dev/api/jokes`;
+  const queryUrl = `https://d7b66a4ksmyox6ckdgqw4iibmq0lwnxd.lambda-url.us-east-1.on.aws/api/jokes`;
 
   const handleSubmit = async () => {
     const reqBody = {};

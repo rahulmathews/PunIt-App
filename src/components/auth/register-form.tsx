@@ -63,7 +63,7 @@ const AuthRegister = () => {
     event.preventDefault();
   };
 
-  const queryUrl = `https://e82p72f2bh.execute-api.us-east-1.amazonaws.com/Dev/api/users/register`;
+  const queryUrl = `https://d7b66a4ksmyox6ckdgqw4iibmq0lwnxd.lambda-url.us-east-1.on.aws/api/users/register`;
 
   const refetch = async (values: any) => {
     const data = await fetch(queryUrl, {

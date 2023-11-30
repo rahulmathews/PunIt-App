@@ -74,6 +74,8 @@ const AuthLogin = () => {
 
     if (data && data.accessToken) {
       localStorage.setItem("access_token", data.accessToken);
+      localStorage.setItem("role", data.user.type);
+      localStorage.setItem("first_name", data.user.firstName);
       router.push("/home");
       setSuccess(true);
     }

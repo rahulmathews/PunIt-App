@@ -32,26 +32,49 @@ const QuillNoSSRWrapper = dynamic(import("react-quill"), {
   loading: () => null,
 });
 
-const NewsFeedItem = ({ joke }: any) => {
+const NewsFeedItem = ({ joke, fetchJokes }: any) => {
   const [upvotes, setUpvotes] = useState(0);
   const [downvotes, setDownvotes] = useState(0);
   const [reports, setReports] = useState(0);
 
   const [success, setSuccess] = React.useState<any>(null);
+  const [reportSuccess, setReportSuccess] = React.useState<any>(false);
 
   const [rating, setRating] = useState(0);
   const [isReported, setIsReported] = useState(false);
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [isDownvoted, setIsDownvoted] = useState(false);
+  const [open, setOpen] = React.useState(false);
+
+  const [reportMessage, setReportMessage] = React.useState("");
 
   const handleClick = () => {
-    setOpen((prev) => !prev);
+    setOpen((prev) => {
+      if (prev === true) {
+        fetchJokes();
+      }
+      return !prev;
+    });
+
+    setReportSuccess((prev: any) => {
+      if (prev === true) {
+        return false;
+      }
+    });
   };
 
   const router = useRouter();
 
   const handleClose = (event: React.SyntheticEvent | Event) => {
     setSuccess({ open: false });
+  };
+
+  const handleReport = () => {
+    if (!isReported) {
+      setReportSuccess((prev: any) => {
+        return !prev;
+      });
+    }
   };
 
   const handleUpvote = async (jokeId: string) => {
@@ -68,18 +91,21 @@ const NewsFeedItem = ({ joke }: any) => {
     }
   };
 
-  const handleReport = async (jokeId: string) => {
+  const submitReport = async (jokeId: string) => {
     if (!isReported) {
+      handleReport();
+      await submitReportAPI(jokeId, reportMessage);
+      handleClick();
       setIsReported(true);
-      await submitReport(jokeId);
     }
   };
 
-  const [open, setOpen] = React.useState(false);
   const handleOpen = (jokeId: string) => {
     setOpen(true);
     handleView(jokeId);
     fetchUpvote(jokeId);
+    fetchDownvote(jokeId);
+    fetchReport(jokeId);
   };
 
   const style = {
@@ -99,6 +125,35 @@ const NewsFeedItem = ({ joke }: any) => {
   };
 
   const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "blockquote",
+    "list",
+    "bullet",
+    "indent",
+    "link",
+    "image",
+  ];
+
+  const reportModules = {
+    toolbar: [
+      [{ header: [1, 2, false] }],
+      ["bold", "italic", "underline", "strike", "blockquote"],
+      [
+        { list: "ordered" },
+        { list: "bullet" },
+        { indent: "-1" },
+        { indent: "+1" },
+      ],
+      ["link"],
+      ["clean"],
+    ],
+  };
+
+  const reportFormats = [
     "header",
     "bold",
     "italic",
@@ -339,7 +394,7 @@ const NewsFeedItem = ({ joke }: any) => {
       });
   };
 
-  const submitReport = async (jokeId: string) => {
+  const submitReportAPI = async (jokeId: string, reportMessage: string) => {
     const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/reports`;
 
     const data = await axios
@@ -347,6 +402,7 @@ const NewsFeedItem = ({ joke }: any) => {
         queryUrl,
         {
           jokeId: jokeId,
+          message: reportMessage,
         },
         {
           headers: {
@@ -435,59 +491,93 @@ const NewsFeedItem = ({ joke }: any) => {
       </Grid>
       <Modal
         open={open}
-        onClose={handleClose}
+        onClose={handleClick}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <ClickAwayListener onClickAway={handleClick}>
-          <Box sx={style}>
-            <CardMedia
-              sx={{ height: 250 }}
-              image={joke.s3Url}
-              title="joke image"
+        {/* <ClickAwayListener onClickAway={handleClick}> */}
+        <Box sx={style}>
+          <CardMedia
+            sx={{ height: 250 }}
+            image={joke.s3Url}
+            title="joke image"
+          />
+          <CardContent>
+            <QuillNoSSRWrapper
+              theme="snow"
+              value={joke.content}
+              modules={modules}
+              formats={formats}
+              readOnly
             />
-            <CardContent>
+          </CardContent>
+          <CardActions>
+            <Grid container direction="row">
+              <Grid item xs={3} sx={{ mr: "20px" }}>
+                <Button
+                  variant={isUpvoted ? "contained" : "outlined"}
+                  color="primary"
+                  onClick={() => handleUpvote(joke.id)}
+                  size="small"
+                >
+                  {isUpvoted ? "Upvoted" : "Upvote"}
+                </Button>
+              </Grid>
+              <Grid item xs={3} sx={{ mr: "20px" }}>
+                <Button
+                  variant={isDownvoted ? "contained" : "outlined"}
+                  color="error"
+                  onClick={() => handleDownvote(joke.id)}
+                  size="small"
+                >
+                  {isDownvoted ? "Downvoted" : "Downvote"}
+                </Button>
+              </Grid>
+              <Grid item xs={3}>
+                <Button
+                  variant={isReported ? "contained" : "outlined"}
+                  color="warning"
+                  onClick={handleReport}
+                  size="small"
+                >
+                  {isReported ? "Reported" : "Report"}
+                </Button>
+              </Grid>
+            </Grid>
+          </CardActions>
+        </Box>
+        {/* </ClickAwayListener> */}
+      </Modal>
+      <Modal
+        open={reportSuccess}
+        onClose={handleReport}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        {/* <ClickAwayListener onClickAway={handleReport}> */}
+        <Box sx={style}>
+          <Grid container direction="column">
+            <Grid item xs={12}>
               <QuillNoSSRWrapper
                 theme="snow"
-                value={joke.content}
-                modules={modules}
-                formats={formats}
-                readOnly
+                value={reportMessage}
+                modules={reportModules}
+                formats={reportFormats}
+                onChange={setReportMessage}
               />
-            </CardContent>
-            <CardActions>
-              <Grid container direction="row" justifyContent="space-between">
-                <Grid item xs={4}>
-                  <Button
-                    variant={isUpvoted ? "contained" : "outlined"}
-                    color="primary"
-                    onClick={() => handleUpvote(joke.id)}
-                  >
-                    {isUpvoted ? "Upvoted" : "Upvote"}
-                  </Button>
-                </Grid>
-                <Grid item xs={4}>
-                  <Button
-                    variant={isDownvoted ? "contained" : "outlined"}
-                    color="error"
-                    onClick={() => handleDownvote(joke.id)}
-                  >
-                    {isDownvoted ? "Downvoted" : "Downvote"}
-                  </Button>
-                </Grid>
-                <Grid item xs={4}>
-                  <Button
-                    variant={isReported ? "contained" : "outlined"}
-                    color="warning"
-                    onClick={() => handleReport(joke.id)}
-                  >
-                    {isReported ? "Reported" : "Report"}
-                  </Button>
-                </Grid>
-              </Grid>
-            </CardActions>
-          </Box>
-        </ClickAwayListener>
+              <Button
+                sx={{ mt: 5 }}
+                variant={isReported ? "contained" : "outlined"}
+                color="warning"
+                onClick={() => submitReport(joke.id)}
+                size="small"
+              >
+                Report
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+        {/* </ClickAwayListener> */}
       </Modal>
     </>
   );

@@ -217,7 +217,7 @@ const Home = () => {
     const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/jokes`;
 
     var formData = new FormData();
-    formData.append("file", image);
+    image && formData.append("file", image);
     formData.append("content", value);
 
     handleClick();
@@ -250,9 +250,10 @@ const Home = () => {
 
     if (data) {
       router.push("/home");
+      fetchJokes();
       setSuccess({
         open: true,
-        success: false,
+        success: true,
         message: "Successfully submitted the joke",
       });
     }
@@ -407,7 +408,7 @@ const Home = () => {
           </Button>
         </Grid>
         <Grid xs={12} sx={{ mb: -2.25 }}>
-          <NewsFeed jokes={jokes} />
+          <NewsFeed jokes={jokes} fetchJokes={fetchJokes} />
         </Grid>
       </Grid>
     </>

@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // material-ui
 import { alpha, useTheme } from "@mui/material/styles";
@@ -23,6 +23,9 @@ import {
 import MainCard from "@punit-app/components/cards/main-card";
 import Transitions from "@punit-app/components/transition";
 import ProfileTab from "./profile-tab";
+
+import { useRouter } from "next/navigation";
+
 import SettingTab from "./setting-tab";
 
 // assets
@@ -32,6 +35,7 @@ import {
   SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import React from "react";
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }: any) {
@@ -65,8 +69,15 @@ function a11yProps(index: any) {
 
 const Profile = () => {
   const theme = useTheme();
+  const router = useRouter();
+
+  const [name, setName] = React.useState("");
 
   const handleLogout = async () => {
+    localStorage?.removeItem("role");
+    localStorage?.removeItem("access_token");
+
+    router.push("/auth");
     // logout
   };
 
@@ -92,6 +103,13 @@ const Profile = () => {
     setValue(newValue);
   };
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const name = window.localStorage.getItem("first_name") || "";
+      setName(name);
+    }
+  }, []);
+
   const iconBackColorOpen = "grey.300";
 
   return (
@@ -112,10 +130,10 @@ const Profile = () => {
         <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }}>
           <Avatar
             alt="profile user"
-            src={"assets/images/users/avatar-1.png"}
+            // src={"assets/images/users/avatar-1.png"}
             sx={{ width: 32, height: 32 }}
           />
-          <Typography variant="subtitle1">John Doe</Typography>
+          <Typography variant="subtitle1">{name}</Typography>
         </Stack>
       </ButtonBase>
       <Popper
@@ -169,11 +187,11 @@ const Profile = () => {
                           >
                             <Avatar
                               alt="profile user"
-                              src={"assets/images/users/avatar-1.png"}
+                              // src={"assets/images/users/avatar-1.png"}
                               sx={{ width: 32, height: 32 }}
                             />
                             <Stack>
-                              <Typography variant="h6">John Doe</Typography>
+                              <Typography variant="h6">{name}</Typography>
                               {/* <Typography variant="body2" color="textSecondary">
                                 UI/UX Designer
                               </Typography> */}

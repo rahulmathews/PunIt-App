@@ -55,7 +55,7 @@ const AuthLogin = () => {
     event.preventDefault();
   };
 
-  const queryUrl = `https://d7b66a4ksmyox6ckdgqw4iibmq0lwnxd.lambda-url.us-east-1.on.aws/api/users/login`;
+  const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/users/login`;
 
   const refetch = async (values: any) => {
     const reqBody = {};
@@ -67,7 +67,6 @@ const AuthLogin = () => {
       }),
       headers: {
         "content-type": "application/json",
-        "access-control-allow-origin": "*",
       },
     })
       .then((response) => response.json())

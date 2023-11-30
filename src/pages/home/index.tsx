@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // material-ui
 import {
   Alert,
   Box,
   Button,
+  ClickAwayListener,
   Grid,
   Modal,
   Snackbar,
@@ -16,17 +17,19 @@ import NewsFeed from "@punit-app/components/news-feed/news-feed";
 import MainLayout from "@punit-app/layout/main-layout";
 import { useSelector } from "react-redux";
 
-// import ReactQuill from "react-quill";
-// import "react-quill/dist/quill.snow.css";
+import "react-quill/dist/quill.snow.css";
 
 // import { Spin } from 'antd';
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
-// const QuillNoSSRWrapper = dynamic(import("react-quill"), {
-//   ssr: false,
-//   loading: () => null,
-// });
+import Image from "next/image";
+import axios from "axios";
+
+const QuillNoSSRWrapper = dynamic(import("react-quill"), {
+  ssr: false,
+  loading: () => null,
+});
 
 // avatar style
 const avatarSX = {
@@ -55,7 +58,7 @@ const modules = {
       { indent: "-1" },
       { indent: "+1" },
     ],
-    ["link", "image"],
+    ["link"],
     ["clean"],
   ],
 };
@@ -184,18 +187,20 @@ const style = {
 const Home = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = (
-    event: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "success") {
-      setSuccess(false);
-    } else {
-      setError(false);
-    }
+  const handleClose = (event: React.SyntheticEvent | Event) => {
+    setSuccess({ success: false });
   };
-  const [success, setSuccess] = React.useState(false);
-  const [error, setError] = React.useState(false);
+
+  const [success, setSuccess] = React.useState<any>(null);
+
+  const [image, setImage] = React.useState("");
+  const [jokes, setJokes] = React.useState(null);
+
+  const handleClick = () => {
+    setOpen((prev) => !prev);
+    setValue("");
+    setImage("");
+  };
 
   const router = useRouter();
 
@@ -203,23 +208,35 @@ const Home = () => {
 
   const [value, setValue] = useState("");
 
-  const queryUrl = `https://d7b66a4ksmyox6ckdgqw4iibmq0lwnxd.lambda-url.us-east-1.on.aws/api/jokes`;
+  const token =
+    typeof window !== "undefined"
+      ? window?.localStorage?.getItem("access_token")
+      : "";
 
   const handleSubmit = async () => {
-    const reqBody = {};
-    const data: any = await fetch(queryUrl, {
-      method: "POST",
-      body: JSON.stringify({
-        content: value,
-      }),
-      headers: {
-        "content-type": "application/json",
-        "access-control-allow-origin": "*",
-        authorization: localStorage.getItem("access_token") as any,
-      },
-    })
-      .then((response) => response.json())
-      .catch((err) => setError(true));
+    const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/jokes`;
+
+    var formData = new FormData();
+    formData.append("file", image);
+    formData.append("content", value);
+
+    handleClick();
+
+    const data = await axios
+      .post(queryUrl, formData, {
+        headers: {
+          "Content-Type": "multipart/formdata",
+          authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => response.data)
+      .catch((err) =>
+        setSuccess({ success: true, message: "Internal Server error" })
+      );
+
+    if (data) {
+      setSuccess(true);
+    }
 
     if (data) {
       router.push("/home");
@@ -227,60 +244,109 @@ const Home = () => {
     }
   };
 
+  const fetchJokes = async () => {
+    const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/jokes`;
+
+    const data = await axios
+      .get(queryUrl, {
+        headers: {
+          "Content-Type": "multipart/formdata",
+          authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => response.data)
+      .catch((err) =>
+        setSuccess({ success: true, message: "Internal Server error" })
+      );
+
+    if (data) {
+      setSuccess({ success: true, message: "Fetched the latest Jokes" });
+    }
+  };
+
+  const UploadAndDisplayImage = () => {
+    return (
+      <div>
+        {image && (
+          <div>
+            <Image
+              alt="not found"
+              width={250}
+              height={150}
+              src={URL.createObjectURL(image as any)}
+            />
+            <br />
+            <button onClick={() => setImage(null as any)}>Remove</button>
+          </div>
+        )}
+
+        <br />
+        <br />
+
+        <input
+          type="file"
+          name="myImage"
+          onChange={(event: any) => {
+            console.log(event?.target?.files[0]);
+            setImage(event.target.files[0]);
+          }}
+        />
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    fetchJokes();
+  }, []);
+
   return (
     <>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={success}
+        open={success?.success}
         autoHideDuration={8000}
-        onClose={(e) => handleClose(e, "success")}
+        onClose={(e) => handleClose(e)}
       >
-        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
-          Successfully Submitted the joke
+        <Alert
+          onClose={handleClose}
+          severity={success?.success ? "success" : "error"}
+          sx={{ width: "100%" }}
+        >
+          {success?.message}
         </Alert>
       </Snackbar>
 
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={error}
-        autoHideDuration={8000}
-        onClose={(e) => handleClose(e, "error")}
-      >
-        <Alert
-          onClose={(e) => handleClose(e, "error")}
-          severity="error"
-          sx={{ width: "100%" }}
-        >
-          Internal Server Error
-        </Alert>
-      </Snackbar>
       <Modal
         open={open}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
-          {/* <QuillNoSSRWrapper
-            theme="snow"
-            value={value}
-            onChange={setValue}
-            modules={modules}
-            formats={formats}
-          /> */}
+        <ClickAwayListener onClickAway={handleClick}>
+          <Box sx={style}>
+            <UploadAndDisplayImage />
+            <QuillNoSSRWrapper
+              theme="snow"
+              value={value}
+              onChange={setValue}
+              modules={modules}
+              formats={formats}
+            />
 
-          <Button
-            disableElevation
-            sx={{ mt: 3 }}
-            size="small"
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-          >
-            Submit
-          </Button>
-        </Box>
+            <Button
+              disableElevation
+              sx={{ mt: 3 }}
+              size="small"
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
+          </Box>
+        </ClickAwayListener>
       </Modal>
+
       <MainLayout />
       <Grid
         container

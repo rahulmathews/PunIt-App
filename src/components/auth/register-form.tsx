@@ -31,6 +31,7 @@ import { useField } from "formik";
 // assets
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import React from "react";
+import axios from "axios";
 
 // ============================|| FIREBASE - REGISTER ||============================ //
 
@@ -63,12 +64,12 @@ const AuthRegister = () => {
     event.preventDefault();
   };
 
-  const queryUrl = `https://d7b66a4ksmyox6ckdgqw4iibmq0lwnxd.lambda-url.us-east-1.on.aws/api/users/register`;
+  const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/users/register`;
 
   const refetch = async (values: any) => {
-    const data = await fetch(queryUrl, {
+    const data = await axios(queryUrl, {
       method: "POST",
-      body: JSON.stringify({
+      data: JSON.stringify({
         email: values.email,
         password: values.password,
         firstName: values.firstname,
@@ -76,11 +77,9 @@ const AuthRegister = () => {
       }),
       headers: {
         "content-type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
       },
     })
-      .then((response) => response.json())
+      .then((response) => response.data)
       .catch((err) => setError(true));
 
     if (data) {
@@ -137,16 +136,21 @@ const AuthRegister = () => {
             .required("Email is required"),
           password: Yup.string().max(255).required("Password is required"),
         })}
-        onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+        onSubmit={async (
+          values,
+          { setErrors, setStatus, setSubmitting, resetForm }
+        ) => {
           try {
             setStatus({ success: false });
             setSubmitting(false);
             await refetch(values as any);
+            resetForm();
           } catch (err: any) {
             console.error(err);
             setStatus({ success: false });
             setErrors({ submit: err.message });
             setSubmitting(false);
+            resetForm();
           }
         }}
       >

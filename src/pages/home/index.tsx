@@ -188,7 +188,7 @@ const Home = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = (event: React.SyntheticEvent | Event) => {
-    setSuccess({ success: false });
+    setSuccess({ open: false });
   };
 
   const [success, setSuccess] = React.useState<any>(null);
@@ -230,17 +230,31 @@ const Home = () => {
         },
       })
       .then((response) => response.data)
-      .catch((err) =>
-        setSuccess({ success: true, message: "Internal Server error" })
-      );
-
-    if (data) {
-      setSuccess(true);
-    }
+      .catch((err) => {
+        if (err.response.status === 401) {
+          setSuccess({
+            open: true,
+            success: false,
+            message: "Session timed out",
+          });
+          window.localStorage.removeItem("access_token");
+          router.push("/auth");
+          return;
+        }
+        setSuccess({
+          open: true,
+          success: false,
+          message: "Internal Server error",
+        });
+      });
 
     if (data) {
       router.push("/home");
-      setSuccess(true);
+      setSuccess({
+        open: true,
+        success: false,
+        message: "Successfully submitted the joke",
+      });
     }
   };
 
@@ -250,17 +264,39 @@ const Home = () => {
     const data = await axios
       .get(queryUrl, {
         headers: {
-          "Content-Type": "multipart/formdata",
+          "Content-Type": "application/json",
           authorization: `Bearer ${token}`,
         },
       })
-      .then((response) => response.data)
-      .catch((err) =>
-        setSuccess({ success: true, message: "Internal Server error" })
-      );
+      .then((response) => {
+        setJokes(response.data);
+        return response.data;
+      })
+      .catch((err) => {
+        if (err.response.status === 401) {
+          setSuccess({
+            open: true,
+            success: false,
+            message: "Session timed out",
+          });
+          window.localStorage.removeItem("access_token");
+          router.push("/auth");
+          return;
+        }
+
+        setSuccess({
+          open: true,
+          success: false,
+          message: "Internal Server error",
+        });
+      });
 
     if (data) {
-      setSuccess({ success: true, message: "Fetched the latest Jokes" });
+      setSuccess({
+        open: true,
+        success: true,
+        message: "Fetched the latest Jokes",
+      });
     }
   };
 
@@ -303,7 +339,7 @@ const Home = () => {
     <>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={success?.success}
+        open={success?.open}
         autoHideDuration={8000}
         onClose={(e) => handleClose(e)}
       >
@@ -371,7 +407,7 @@ const Home = () => {
           </Button>
         </Grid>
         <Grid xs={12} sx={{ mb: -2.25 }}>
-          <NewsFeed content={"Haha nice joke"} />
+          <NewsFeed jokes={jokes} />
         </Grid>
       </Grid>
     </>

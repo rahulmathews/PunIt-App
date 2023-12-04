@@ -473,15 +473,15 @@ const NewsFeedItem = ({ joke, fetchJokes, showActions }: any) => {
           </CardContent>
           <CardActions>
             <Grid container direction="row" justifyContent="space-evenly">
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <ArrowCircleUpIcon color="success" />
                 {joke.upvotes}
               </Grid>
-              <Grid item xs={4}>
+              {/* <Grid item xs={4}>
                 <ArrowCircleDownIcon color="error" />
                 {joke.downvotes}
-              </Grid>
-              <Grid item xs={4}>
+              </Grid> */}
+              <Grid item xs={6}>
                 <ReportGmailerrorredIcon color="warning" />
                 {joke.reports}
               </Grid>
@@ -540,7 +540,7 @@ const NewsFeedItem = ({ joke, fetchJokes, showActions }: any) => {
                   onClick={handleReport}
                   size="small"
                 >
-                  {isReported ? "Reported" : "Report"}
+                  {isReported ? "Commented" : "Comment"}
                 </Button>
               </Grid>
             </Grid>
@@ -572,7 +572,7 @@ const NewsFeedItem = ({ joke, fetchJokes, showActions }: any) => {
                 onClick={() => submitReport(joke.id)}
                 size="small"
               >
-                Report
+                Comment
               </Button>
             </Grid>
           </Grid>

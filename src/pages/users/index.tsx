@@ -7,6 +7,7 @@ import {
   AvatarGroup,
   Box,
   Button,
+  ClickAwayListener,
   Grid,
   List,
   ListItemAvatar,
@@ -14,6 +15,7 @@ import {
   ListItemSecondaryAction,
   ListItemText,
   MenuItem,
+  Modal,
   Snackbar,
   Stack,
   TextField,
@@ -64,6 +66,20 @@ const actionSX = {
   transform: "none",
 };
 
+const style = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 600,
+  height: 150,
+  overflowY: "scroll",
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
 //nested data is ok, see accessorKeys in ColumnDef below
 
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
@@ -72,11 +88,20 @@ const User = () => {
   const { drawerOpen } = useSelector((state: any) => state.menu);
   const [data, setData] = React.useState([]);
 
-  const [success, setSuccess] = React.useState<any>(null);
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
 
+  const [status, setStatus] = React.useState("");
+  const [userId, setUserId] = React.useState("");
   const handleClose = (event: React.SyntheticEvent | Event) => {
     setSuccess({ open: false });
   };
+
+  const handleClick = () => {
+    setOpen((prev) => !prev);
+  };
+
+  const [success, setSuccess] = React.useState<any>(null);
 
   const router = useRouter();
 
@@ -93,40 +118,47 @@ const User = () => {
       {
         accessorKey: "status", //normal accessorKey
         header: "Status",
-        Cell: ({ cell }) => (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: "1rem",
-              ...(cell.getValue() === "ACTIVE"
-                ? { bgcolor: "green" }
-                : { bgcolor: "red" }),
-              padding: "10px",
-              borderRadius: "10px",
-              color: "white",
-            }}
-          >
-            {cell.getValue() as any}
-          </Box>
-        ),
       },
       {
         accessorKey: "email",
         header: "Email",
       },
       {
-        accessorKey: "block",
-        header: "Block",
+        accessorKey: "approve",
+        header: "Approve",
         Cell: ({ cell }) => (
           // <Box component="span">
           <Button
             variant="contained"
             size="small"
-            color="error"
-            onClick={() => {}}
+            color="primary"
+            onClick={() => {
+              handleOpen();
+              setStatus("APPROVE");
+              setUserId(cell.row.original.id);
+            }}
           >
-            Block
+            Approve
+          </Button>
+          // </Box>
+        ),
+      },
+      {
+        accessorKey: "activate",
+        header: "Activate",
+        Cell: ({ cell }) => (
+          // <Box component="span">
+          <Button
+            variant="contained"
+            size="small"
+            color="primary"
+            onClick={() => {
+              handleOpen();
+              setUserId(cell.row.original.id);
+              setStatus("ACTIVE");
+            }}
+          >
+            Activate
           </Button>
           // </Box>
         ),
@@ -199,19 +231,19 @@ const User = () => {
       setSuccess({
         open: true,
         success: true,
-        message: "Fetched the latest Jokes",
+        message: "Fetched the latest Users",
       });
     }
   };
 
-  const blockUser = async (userId: any) => {
+  const changeStatus = async () => {
     const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/users/${userId}`;
 
     const data = await axios
-      .post(
+      .put(
         queryUrl,
         {
-          status: "BLOCKED",
+          status,
         },
         {
           headers: {
@@ -247,9 +279,12 @@ const User = () => {
       setSuccess({
         open: true,
         success: true,
-        message: "Fetched the latest Jokes",
+        message: "Fetched the latest Users",
       });
     }
+
+    setOpen(false);
+    fetchUsers();
   };
 
   useEffect(() => {
@@ -272,6 +307,30 @@ const User = () => {
           {success?.message}
         </Alert>
       </Snackbar>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <ClickAwayListener onClickAway={handleClick}>
+          <Box sx={style}>
+            <Typography variant="h5">
+              Are you sure you want to proceed with this?
+            </Typography>
+            <Button
+              disableElevation
+              sx={{ mt: 3 }}
+              size="small"
+              variant="contained"
+              color="primary"
+              onClick={changeStatus}
+            >
+              Submit
+            </Button>
+          </Box>
+        </ClickAwayListener>
+      </Modal>
       <MainLayout />
       <Grid
         container

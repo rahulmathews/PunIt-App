@@ -60,6 +60,11 @@ const AuthRegister = () => {
     setShowPassword(!showPassword);
   };
 
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const handleClickShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   const handleMouseDownPassword = (event: { preventDefault: () => void }) => {
     event.preventDefault();
   };
@@ -125,6 +130,7 @@ const AuthRegister = () => {
           email: "",
           company: "",
           password: "",
+          confirmPassword: "",
           submit: null,
         }}
         validationSchema={Yup.object().shape({
@@ -135,6 +141,10 @@ const AuthRegister = () => {
             .max(255)
             .required("Email is required"),
           password: Yup.string().max(255).required("Password is required"),
+          confirmPassword: Yup.string()
+            .max(255)
+            .required("Confirm Password is required")
+            .oneOf([Yup.ref("password")], "Passwords must match"),
         })}
         onSubmit={async (
           values,
@@ -269,6 +279,54 @@ const AuthRegister = () => {
                   {touched.password && errors.password && (
                     <FormHelperText error id="helper-text-password-signup">
                       {errors.password}
+                    </FormHelperText>
+                  )}
+                </Stack>
+              </Grid>
+              <Grid item xs={12}>
+                <Stack spacing={0.5}>
+                  <InputLabel htmlFor="password-confirm-signup">
+                    Confirm Password
+                  </InputLabel>
+                  <OutlinedInput
+                    fullWidth
+                    error={Boolean(
+                      touched.confirmPassword && errors.confirmPassword
+                    )}
+                    id="password-confirm-signup"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={values.confirmPassword}
+                    name="confirmPassword"
+                    onBlur={handleBlur}
+                    onChange={(e) => {
+                      handleChange(e);
+                    }}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle confirm password visibility"
+                          onClick={handleClickShowConfirmPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                          size="large"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOutlined />
+                          ) : (
+                            <EyeInvisibleOutlined />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    placeholder="******"
+                    inputProps={{}}
+                  />
+                  {touched.confirmPassword && errors.confirmPassword && (
+                    <FormHelperText
+                      error
+                      id="helper-text-confirm-password-signup"
+                    >
+                      {errors.confirmPassword}
                     </FormHelperText>
                   )}
                 </Stack>

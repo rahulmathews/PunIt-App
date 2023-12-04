@@ -58,48 +58,30 @@ type Person = {
 const data: Person[] = [
   {
     name: {
-      firstName: "John",
-      lastName: "Doe",
+      firstName: "Rahul123",
+      lastName: "M",
     },
-    address: "261 Erdman Ford",
-    city: "East Daphne",
-    state: "Kentucky",
+    address: "2",
+    city: "Accepted",
+    state: "3",
   },
   {
     name: {
-      firstName: "Jane",
-      lastName: "Doe",
+      firstName: "Srinivas",
+      lastName: "K",
     },
-    address: "769 Dominic Grove",
-    city: "Columbus",
-    state: "Ohio",
+    address: "1",
+    city: "Rejected",
+    state: "7",
   },
   {
     name: {
-      firstName: "Joe",
-      lastName: "Doe",
+      firstName: "Rahul123",
+      lastName: "M",
     },
-    address: "566 Brakus Inlet",
-    city: "South Linda",
-    state: "West Virginia",
-  },
-  {
-    name: {
-      firstName: "Kevin",
-      lastName: "Vandy",
-    },
-    address: "722 Emie Stream",
-    city: "Lincoln",
-    state: "Nebraska",
-  },
-  {
-    name: {
-      firstName: "Joshua",
-      lastName: "Rolluffs",
-    },
-    address: "32188 Larkin Turnpike",
-    city: "Omaha",
-    state: "Nebraska",
+    address: "3",
+    city: "Blocked",
+    state: "20",
   },
 ];
 
@@ -115,27 +97,27 @@ const Report = () => {
     () => [
       {
         accessorKey: "name.firstName", //access nested data with dot notation
-        header: "First Name",
+        header: "Tracking No",
         // size: 150,
       },
       {
         accessorKey: "name.lastName",
-        header: "Last Name",
+        header: "Reported By",
         // size: 150,
       },
       {
         accessorKey: "address", //normal accessorKey
-        header: "Address",
+        header: "Post",
         // size: 200,
       },
       {
         accessorKey: "city",
-        header: "City",
+        header: "Status",
         // size: 150,
       },
       {
         accessorKey: "state",
-        header: "State",
+        header: "Total Reports",
         // size: 150,
       },
     ],

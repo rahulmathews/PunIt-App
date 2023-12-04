@@ -32,7 +32,7 @@ const QuillNoSSRWrapper = dynamic(import("react-quill"), {
   loading: () => null,
 });
 
-const NewsFeedItem = ({ joke, fetchJokes }: any) => {
+const NewsFeedItem = ({ joke, fetchJokes, showActions }: any) => {
   const [upvotes, setUpvotes] = useState(0);
   const [downvotes, setDownvotes] = useState(0);
   const [reports, setReports] = useState(0);

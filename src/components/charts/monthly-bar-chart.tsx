@@ -56,7 +56,7 @@ const MonthlyBarChart = () => {
 
   const [series] = useState([
     {
-      data: [80, 95, 70, 42, 65, 55, 78],
+      data: [2, 4, 5, 3, 7, 1, 6],
     },
   ]);
 

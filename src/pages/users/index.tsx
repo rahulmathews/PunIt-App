@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 // material-ui
 import {
+  Alert,
   Avatar,
   AvatarGroup,
   Box,
@@ -13,6 +14,7 @@ import {
   ListItemSecondaryAction,
   ListItemText,
   MenuItem,
+  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -41,6 +43,9 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
+import axios from "axios";
+import React from "react";
+import { useRouter } from "next/navigation";
 
 // avatar style
 const avatarSX = {
@@ -59,112 +64,72 @@ const actionSX = {
   transform: "none",
 };
 
-// sales report status
-const status = [
-  {
-    value: "today",
-    label: "Today",
-  },
-  {
-    value: "month",
-    label: "This Month",
-  },
-  {
-    value: "year",
-    label: "This Year",
-  },
-];
-
-type Person = {
-  name: {
-    firstName: string;
-    lastName: string;
-  };
-  address: string;
-  city: string;
-  state: string;
-};
-
 //nested data is ok, see accessorKeys in ColumnDef below
-const data: Person[] = [
-  {
-    name: {
-      firstName: "John",
-      lastName: "Doe",
-    },
-    address: "261 Erdman Ford",
-    city: "East Daphne",
-    state: "Kentucky",
-  },
-  {
-    name: {
-      firstName: "Jane",
-      lastName: "Doe",
-    },
-    address: "769 Dominic Grove",
-    city: "Columbus",
-    state: "Ohio",
-  },
-  {
-    name: {
-      firstName: "Joe",
-      lastName: "Doe",
-    },
-    address: "566 Brakus Inlet",
-    city: "South Linda",
-    state: "West Virginia",
-  },
-  {
-    name: {
-      firstName: "Kevin",
-      lastName: "Vandy",
-    },
-    address: "722 Emie Stream",
-    city: "Lincoln",
-    state: "Nebraska",
-  },
-  {
-    name: {
-      firstName: "Joshua",
-      lastName: "Rolluffs",
-    },
-    address: "32188 Larkin Turnpike",
-    city: "Omaha",
-    state: "Nebraska",
-  },
-];
 
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 const User = () => {
   const { drawerOpen } = useSelector((state: any) => state.menu);
+  const [data, setData] = React.useState([]);
 
-  const columns = useMemo<MRT_ColumnDef<Person>[]>(
+  const [success, setSuccess] = React.useState<any>(null);
+
+  const handleClose = (event: React.SyntheticEvent | Event) => {
+    setSuccess({ open: false });
+  };
+
+  const router = useRouter();
+
+  const columns = useMemo<MRT_ColumnDef<any>[]>(
     () => [
       {
-        accessorKey: "name.firstName", //access nested data with dot notation
+        accessorKey: "firstName", //access nested data with dot notation
         header: "First Name",
-        // size: 150,
       },
       {
-        accessorKey: "name.lastName",
+        accessorKey: "lastName",
         header: "Last Name",
-        // size: 150,
       },
       {
-        accessorKey: "address", //normal accessorKey
-        header: "Address",
-        // size: 200,
+        accessorKey: "status", //normal accessorKey
+        header: "Status",
+        Cell: ({ cell }) => (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+              ...(cell.getValue() === "ACTIVE"
+                ? { bgcolor: "green" }
+                : { bgcolor: "red" }),
+              padding: "10px",
+              borderRadius: "10px",
+              color: "white",
+            }}
+          >
+            {cell.getValue() as any}
+          </Box>
+        ),
       },
       {
-        accessorKey: "city",
-        header: "City",
-        // size: 150,
+        accessorKey: "email",
+        header: "Email",
       },
       {
-        accessorKey: "state",
-        header: "State",
-        // size: 150,
+        accessorKey: "block",
+        header: "Block",
+        Cell: ({ cell }) => (
+          // <Box component="span">
+          <Button
+            variant="contained"
+            size="small"
+            color="error"
+            onClick={() => {}}
+          >
+            Block
+          </Button>
+          // </Box>
+        ),
       },
     ],
     []
@@ -192,8 +157,121 @@ const User = () => {
     },
   });
 
+  const token =
+    typeof window !== "undefined"
+      ? window?.localStorage?.getItem("access_token")
+      : "";
+
+  const fetchUsers = async () => {
+    const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/users`;
+
+    const data = await axios
+      .get(queryUrl, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setData(response.data);
+        return response.data;
+      })
+      .catch((err) => {
+        if (err.response.status === 401) {
+          setSuccess({
+            open: true,
+            success: false,
+            message: "Session timed out",
+          });
+          window.localStorage.removeItem("access_token");
+          router.push("/auth");
+          return;
+        }
+
+        setSuccess({
+          open: true,
+          success: false,
+          message: "Internal Server error",
+        });
+      });
+
+    if (data) {
+      setSuccess({
+        open: true,
+        success: true,
+        message: "Fetched the latest Jokes",
+      });
+    }
+  };
+
+  const blockUser = async (userId: any) => {
+    const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/users/${userId}`;
+
+    const data = await axios
+      .post(
+        queryUrl,
+        {
+          status: "BLOCKED",
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        setData(response.data);
+        return response.data;
+      })
+      .catch((err) => {
+        if (err.response.status === 401) {
+          setSuccess({
+            open: true,
+            success: false,
+            message: "Session timed out",
+          });
+          window.localStorage.removeItem("access_token");
+          router.push("/auth");
+          return;
+        }
+
+        setSuccess({
+          open: true,
+          success: false,
+          message: "Internal Server error",
+        });
+      });
+
+    if (data) {
+      setSuccess({
+        open: true,
+        success: true,
+        message: "Fetched the latest Jokes",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   return (
     <>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={success?.open}
+        autoHideDuration={8000}
+        onClose={(e) => handleClose(e)}
+      >
+        <Alert
+          onClose={handleClose}
+          severity={success?.success ? "success" : "error"}
+          sx={{ width: "100%" }}
+        >
+          {success?.message}
+        </Alert>
+      </Snackbar>
       <MainLayout />
       <Grid
         container

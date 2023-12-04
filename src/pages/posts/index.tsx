@@ -1,46 +1,35 @@
-import { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // material-ui
 import {
-  Avatar,
-  AvatarGroup,
+  Alert,
   Box,
   Button,
+  ClickAwayListener,
   Grid,
-  List,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemSecondaryAction,
-  ListItemText,
-  MenuItem,
-  Stack,
-  TextField,
+  Modal,
+  Snackbar,
   Typography,
 } from "@mui/material";
 
-// project import
-import OrdersTable from "@punit-app/components/tables/orders-table";
-import IncomeAreaChart from "@punit-app/components/charts/income-area-chart";
-import MonthlyBarChart from "@punit-app/components/charts/monthly-bar-chart";
-import ReportAreaChart from "@punit-app/components/charts/report-area-chart";
-import SalesColumnChart from "@punit-app/components/charts/sales-column-chart";
-import MainCard from "@punit-app/components/cards/main-card";
-import AnalyticEcommerce from "@punit-app/components/stats/analytics-ecommerce";
-
-// assets
-import {
-  GiftOutlined,
-  MessageOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
+import NewsFeed from "@punit-app/components/news-feed/news-feed";
 
 import MainLayout from "@punit-app/layout/main-layout";
 import { useSelector } from "react-redux";
-import {
-  MRT_ColumnDef,
-  MaterialReactTable,
-  useMaterialReactTable,
-} from "material-react-table";
+
+import "react-quill/dist/quill.snow.css";
+
+// import { Spin } from 'antd';
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+
+import Image from "next/image";
+import axios from "axios";
+
+const QuillNoSSRWrapper = dynamic(import("react-quill"), {
+  ssr: false,
+  loading: () => null,
+});
 
 // avatar style
 const avatarSX = {
@@ -59,6 +48,35 @@ const actionSX = {
   transform: "none",
 };
 
+const modules = {
+  toolbar: [
+    [{ header: [1, 2, false] }],
+    ["bold", "italic", "underline", "strike", "blockquote"],
+    [
+      { list: "ordered" },
+      { list: "bullet" },
+      { indent: "-1" },
+      { indent: "+1" },
+    ],
+    ["link"],
+    ["clean"],
+  ],
+};
+
+const formats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "blockquote",
+  "list",
+  "bullet",
+  "indent",
+  "link",
+  "image",
+];
+
 // sales report status
 const status = [
   {
@@ -75,139 +93,312 @@ const status = [
   },
 ];
 
-type Person = {
-  name: {
-    firstName: string;
-    lastName: string;
-  };
-  address: string;
-  city: string;
-  state: string;
-};
-
-//nested data is ok, see accessorKeys in ColumnDef below
-const data: Person[] = [
+const jokes = [
   {
-    name: {
-      firstName: "John",
-      lastName: "Doe",
-    },
-    address: "261 Erdman Ford",
-    city: "East Daphne",
-    state: "Kentucky",
+    text: "haha, this is by far the best joke",
+    type: "text",
+    upvotes: 1203,
+    downvotes: 20,
+    reports: 5,
+    rating: 3.5,
   },
   {
-    name: {
-      firstName: "Jane",
-      lastName: "Doe",
-    },
-    address: "769 Dominic Grove",
-    city: "Columbus",
-    state: "Ohio",
+    text: "haha, Second Joke",
+    type: "text",
+    upvotes: 1003,
+    downvotes: 30,
+    reports: 7,
+    rating: 3.9,
   },
   {
-    name: {
-      firstName: "Joe",
-      lastName: "Doe",
-    },
-    address: "566 Brakus Inlet",
-    city: "South Linda",
-    state: "West Virginia",
+    text: "haha, Third Joke",
+    type: "text",
+    upvotes: 1445,
+    downvotes: 22,
+    reports: 14,
+    rating: 3.2,
   },
   {
-    name: {
-      firstName: "Kevin",
-      lastName: "Vandy",
-    },
-    address: "722 Emie Stream",
-    city: "Lincoln",
-    state: "Nebraska",
+    text: "just, kidding",
+    type: "text",
+    upvotes: 1948,
+    downvotes: 29,
+    reports: 21,
+    rating: 4.3,
   },
   {
-    name: {
-      firstName: "Joshua",
-      lastName: "Rolluffs",
-    },
-    address: "32188 Larkin Turnpike",
-    city: "Omaha",
-    state: "Nebraska",
+    text: "fake laugh",
+    type: "text",
+    upvotes: 22019,
+    downvotes: 120,
+    reports: 34,
+    rating: 4.1,
+  },
+  {
+    text: "Leo meme",
+    type: "text",
+    upvotes: 23409,
+    downvotes: 12,
+    reports: 19,
+    rating: 4.5,
+  },
+  {
+    text: "Another Meme",
+    type: "text",
+    upvotes: 1902,
+    downvotes: 28,
+    reports: 3,
+    rating: 3.1,
+  },
+  {
+    text: "Another Fake meme",
+    type: "text",
+    upvotes: 12023,
+    downvotes: 222,
+    reports: 19,
+    rating: 3.6,
+  },
+  {
+    text: "Not so good meme",
+    type: "text",
+    upvotes: 12030,
+    downvotes: 593,
+    reports: 55,
+    rating: 2.5,
   },
 ];
+
+const style = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 600,
+  height: 550,
+  overflowY: "scroll",
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
 
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 const Post = () => {
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = (event: React.SyntheticEvent | Event) => {
+    setSuccess({ open: false });
+  };
+
+  const [success, setSuccess] = React.useState<any>(null);
+
+  const [image, setImage] = React.useState("");
+  const [jokes, setJokes] = React.useState(null);
+
+  const handleClick = () => {
+    setOpen((prev) => !prev);
+    setValue("");
+    setImage("");
+  };
+
+  const router = useRouter();
+
   const { drawerOpen } = useSelector((state: any) => state.menu);
 
-  const columns = useMemo<MRT_ColumnDef<Person>[]>(
-    () => [
-      {
-        accessorKey: "name.firstName", //access nested data with dot notation
-        header: "First Name",
-        // size: 150,
-      },
-      {
-        accessorKey: "name.lastName",
-        header: "Last Name",
-        // size: 150,
-      },
-      {
-        accessorKey: "address", //normal accessorKey
-        header: "Address",
-        // size: 200,
-      },
-      {
-        accessorKey: "city",
-        header: "City",
-        // size: 150,
-      },
-      {
-        accessorKey: "state",
-        header: "State",
-        // size: 150,
-      },
-    ],
-    []
-  );
+  const [value, setValue] = useState("");
 
-  const table = useMaterialReactTable({
-    columns,
-    data, //data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
-    muiTableProps: {
-      sx: {
-        border: "1px solid #1677ff",
-      },
-    },
-    muiTableHeadCellProps: {
-      sx: {
-        border: "1px solid #1677ff",
-        fontStyle: "italic",
-        fontWeight: "normal",
-      },
-    },
-    muiTableBodyCellProps: {
-      sx: {
-        border: "1px solid #1677ff",
-      },
-    },
-  });
+  const token =
+    typeof window !== "undefined"
+      ? window?.localStorage?.getItem("access_token")
+      : "";
+
+  const handleSubmit = async () => {
+    const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/jokes`;
+
+    var formData = new FormData();
+    image && formData.append("file", image);
+    formData.append("content", value);
+
+    handleClick();
+
+    const data = await axios
+      .post(queryUrl, formData, {
+        headers: {
+          "Content-Type": "multipart/formdata",
+          authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => response.data)
+      .catch((err) => {
+        if (err.response.status === 401) {
+          setSuccess({
+            open: true,
+            success: false,
+            message: "Session timed out",
+          });
+          window.localStorage.removeItem("access_token");
+          router.push("/auth");
+          return;
+        }
+        setSuccess({
+          open: true,
+          success: false,
+          message: "Internal Server error",
+        });
+      });
+
+    if (data) {
+      router.push("/home");
+      fetchJokes();
+      setSuccess({
+        open: true,
+        success: true,
+        message: "Successfully submitted the joke",
+      });
+    }
+  };
+
+  const fetchJokes = async () => {
+    const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/jokes`;
+
+    const data = await axios
+      .get(queryUrl, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setJokes(response.data);
+        return response.data;
+      })
+      .catch((err) => {
+        if (err.response.status === 401) {
+          setSuccess({
+            open: true,
+            success: false,
+            message: "Session timed out",
+          });
+          window.localStorage.removeItem("access_token");
+          router.push("/auth");
+          return;
+        }
+
+        setSuccess({
+          open: true,
+          success: false,
+          message: "Internal Server error",
+        });
+      });
+
+    if (data) {
+      setSuccess({
+        open: true,
+        success: true,
+        message: "Fetched the latest Jokes",
+      });
+    }
+  };
+
+  const UploadAndDisplayImage = () => {
+    return (
+      <div>
+        {image && (
+          <div>
+            <Image
+              alt="not found"
+              width={250}
+              height={150}
+              src={URL.createObjectURL(image as any)}
+            />
+            <br />
+            <button onClick={() => setImage(null as any)}>Remove</button>
+          </div>
+        )}
+
+        <br />
+        <br />
+
+        <input
+          type="file"
+          name="myImage"
+          onChange={(event: any) => {
+            console.log(event?.target?.files[0]);
+            setImage(event.target.files[0]);
+          }}
+        />
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    fetchJokes();
+  }, []);
 
   return (
     <>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={success?.open}
+        autoHideDuration={8000}
+        onClose={(e) => handleClose(e)}
+      >
+        <Alert
+          onClose={handleClose}
+          severity={success?.success ? "success" : "error"}
+          sx={{ width: "100%" }}
+        >
+          {success?.message}
+        </Alert>
+      </Snackbar>
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <ClickAwayListener onClickAway={handleClick}>
+          <Box sx={style}>
+            <UploadAndDisplayImage />
+            <QuillNoSSRWrapper
+              theme="snow"
+              value={value}
+              onChange={setValue}
+              modules={modules}
+              formats={formats}
+            />
+
+            <Button
+              disableElevation
+              sx={{ mt: 3 }}
+              size="small"
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
+          </Box>
+        </ClickAwayListener>
+      </Modal>
+
       <MainLayout />
       <Grid
         container
+        rowSpacing={4.5}
         columnSpacing={2.75}
         sx={
-          drawerOpen ? { ml: "265px", width: "80%" } : { ml: 5, width: "95%" }
+          drawerOpen ? { ml: "260px", width: "80%" } : { ml: 0, width: "100%" }
         }
       >
         {/* row 1 */}
-        <Grid item xs={12} sx={{}}>
+        <Grid item xs={12} sx={{ mb: -2.25 }}>
           <Typography variant="h5">Posts</Typography>
         </Grid>
-        <Grid xs={12} sx={{ mt: 2 }}>
-          <MaterialReactTable table={table} />
+        <Grid xs={12} sx={{ mb: -2.25 }}>
+          <NewsFeed jokes={jokes} fetchJokes={fetchJokes} />
         </Grid>
       </Grid>
     </>

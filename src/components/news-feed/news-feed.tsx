@@ -15,7 +15,7 @@ import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
 import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
 import NewsFeedItem from "./news-feed-item";
 
-const NewsFeed = ({ jokes, fetchJokes }: any) => {
+const NewsFeed = ({ jokes, fetchJokes, showActions }: any) => {
   const [votes, setVotes] = useState(0);
   const [rating, setRating] = useState(0);
   const [isReported, setReported] = useState(false);
@@ -29,7 +29,12 @@ const NewsFeed = ({ jokes, fetchJokes }: any) => {
     >
       {jokes?.map((joke: any) => {
         return (
-          <NewsFeedItem key={joke.id} joke={joke} fetchJokes={fetchJokes} />
+          <NewsFeedItem
+            key={joke.id}
+            joke={joke}
+            fetchJokes={fetchJokes}
+            showActions
+          />
         );
       })}
     </Grid>

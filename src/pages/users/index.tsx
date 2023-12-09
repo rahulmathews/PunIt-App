@@ -133,12 +133,17 @@ const User = () => {
             size="small"
             color="primary"
             onClick={() => {
-              handleOpen();
-              setStatus("APPROVE");
-              setUserId(cell.row.original.id);
+              if (cell.row.original.status === "NEW") {
+                handleOpen();
+                setStatus("APPROVE");
+                setUserId(cell.row.original.id);
+              }
             }}
           >
-            Approve
+            {cell.row.original.status === "ACTIVE" ||
+            cell.row.original.status === "APPROVE"
+              ? "Approved"
+              : "Approve"}
           </Button>
           // </Box>
         ),
@@ -153,12 +158,14 @@ const User = () => {
             size="small"
             color="primary"
             onClick={() => {
-              handleOpen();
-              setUserId(cell.row.original.id);
-              setStatus("ACTIVE");
+              if (cell.row.original.status === "APPROVE") {
+                handleOpen();
+                setUserId(cell.row.original.id);
+                setStatus("ACTIVE");
+              }
             }}
           >
-            Activate
+            {cell.row.original.status === "ACTIVE" ? "Activated" : "Activate"}
           </Button>
           // </Box>
         ),

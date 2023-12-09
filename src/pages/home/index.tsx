@@ -213,6 +213,11 @@ const Home = () => {
       ? window?.localStorage?.getItem("access_token")
       : "";
 
+  const userStatus =
+    typeof window !== "undefined"
+      ? window?.localStorage?.getItem("status")
+      : "";
+
   const handleSubmit = async () => {
     const queryUrl = `${process.env.NEXT_PUBLIC_API_SERVER}/api/jokes`;
 
@@ -401,7 +406,11 @@ const Home = () => {
             size="small"
             variant="contained"
             color="primary"
-            onClick={handleOpen}
+            onClick={() => {
+              if (userStatus === "ACTIVE") {
+                handleOpen();
+              }
+            }}
             sx={{ float: "right" }}
           >
             Add new Joke

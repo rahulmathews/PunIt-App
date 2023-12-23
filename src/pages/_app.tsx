@@ -7,7 +7,7 @@ import { theme } from "../themes/theme";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <MantineProvider theme={theme}>
+    <MantineProvider theme={theme} classNamesPrefix="punit">
       <Head>
         <title>Punit App</title>
         <meta
